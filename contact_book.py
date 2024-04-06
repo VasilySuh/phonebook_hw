@@ -22,9 +22,9 @@ def view_contacts():
     for contact in contacts:
         print(contact)
 
-# Поиск контакта по имени
-def search_contact(name):
-    cursor.execute("SELECT * FROM phonebook WHERE name=?", (name,))
+# Поиск контакта по id
+def search_contact(id_contact):
+    cursor.execute("SELECT * FROM phonebook WHERE id=?", (id_contact))
     contact = cursor.fetchone()
     if contact:
         print(contact)
@@ -32,14 +32,14 @@ def search_contact(name):
         print("Контакт не найден")
 
 # Удаление контакта
-def delete_contact(name):
-    cursor.execute("DELETE FROM phonebook WHERE name=?", (name,))
+def delete_contact(id_contact):
+    cursor.execute("DELETE FROM phonebook WHERE id=?", (id_contact))
     conn.commit()
     print("Контакт успешно удален")
 
 # Изменение номера телефона
-def edit_contact(name, new_phone_number):
-    cursor.execute("UPDATE phonebook SET phone_number=? WHERE name=?", (new_phone_number, name))
+def edit_contact(id_contact, new_phone_number):
+    cursor.execute("UPDATE phonebook SET phone_number=? WHERE name=?", (id_contact, new_phone_number))
     conn.commit()
     print("Номер телефона успешно изменен")
 
@@ -52,29 +52,25 @@ while True:
     4 - Изменить контакт\n\
     5 - Удалить контакт\n\
     0 - Выйти из приложения\n')
-#     #6 - Просмотреть все контакты\n\
     print()
     if user_choice == '1':
         print(view_contacts())
         print()
     elif user_choice == '2':
-        search_contact(name = input("Введите имя контакта: "))
+        search_contact(id_contact = input("Введите id контакта: "))
         print()
     elif user_choice == '3':
-        add_contact(name = input("Введите имя: "))
+        add_contact(name = input("Введите имя контакта: "), phone_number = input("Введите номер телефона контакта: "))
         print()
         pass
     elif user_choice == '4':
-        edit_contact(name = input("Введите имя контакта: "), phone_number = input("Введите номер телефона контакта: "))
+        edit_contact(id_contact = input("Введите id контакта: "), new_phone_number = input("Введите номер телефона контакта: "))
         print()
         pass
     elif user_choice == '5':
-        delete_contact(name = input("Введите имя контакта: "))
+        delete_contact(id_contact = input("Введите id контакта: "))
         print()
         pass
-#     # elif user_choice == '6':
-#     #     #show_phonebook(phonebook)
-#     #     pass
     elif user_choice == '0':
         print('До свидания!')
         print()
