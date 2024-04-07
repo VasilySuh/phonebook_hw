@@ -37,11 +37,11 @@ def delete_contact(id_contact):
     conn.commit()
     print("Контакт успешно удален")
 
-# Изменение номера телефона
-def edit_contact(id_contact, new_phone_number):
-    cursor.execute("UPDATE phonebook SET phone_number=? WHERE name=?", (id_contact, new_phone_number))
+# Изменение контакта
+def edit_contact(id_contact, new_name, new_phone_number):
+    cursor.execute("UPDATE phonebook SET name = ?, phone_number = ? WHERE id = ?", (new_name, new_phone_number, id_contact))
     conn.commit()
-    print("Номер телефона успешно изменен")
+    print("Контакт успешно изменен")
 
 while True:
     print('Что вы хотите сделать?')
@@ -64,7 +64,7 @@ while True:
         print()
         pass
     elif user_choice == '4':
-        edit_contact(id_contact = input("Введите id контакта: "), new_phone_number = input("Введите номер телефона контакта: "))
+        edit_contact(id_contact = input("Введите id контакта: "), new_name = input("Введите новое имя контакта: "), new_phone_number = input("Введите номер телефона контакта: "))
         print()
         pass
     elif user_choice == '5':
