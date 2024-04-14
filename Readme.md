@@ -6,10 +6,7 @@
 3. *Поиск контактов по id.*
 4. *Удаление контактов.*
 5. *Редактирование контактов по  id.*
-
-**В планах:**
-1. *Прописать возможность добавления нескольких номеров телефона к одному контакту, электронной почты и адресов.*
-2. *Добавить возможность редактирования параметров перечисленных в пункте 1.*
+6. *Добавление и редактирование нескольких номеров телефона к одному контакту, электронной почты и адресов.*
 
 **Реализация программы:**
 
@@ -21,100 +18,108 @@ conn = sqlite3.connect('phonebook.db')
 cursor = conn.cursor()
 ```
 
-
-2.  _Создание таблицы:_
-
+2. _Импорт Easy GUI:_
+```
+import easygui 
+from easygui import*
 ```
 
+3.  _Создание таблицы:_
+
+```
 cursor.execute('''CREATE TABLE IF NOT EXISTS phonebook
                 (id INTEGER PRIMARY KEY AUTOINCREMENT,
                 name TEXT NOT NULL,
-                phone_number TEXT NOT NULL)''')
-#создаём таблицу phonebook состоящую из столбцов id, name и phone_number
-```
-3. _Функция для добавления контакта:_
+                phone_number TEXT NOT NULL, extra_phone_number TEXT NOT NULL, 
+               email TEXT NOT NULL, address TEXT NOT NULL)''')
 
 ```
-def add_contact(name, phone_number):
-    cursor.execute("INSERT INTO phonebook (name, phone_number) VALUES (?, ?)", (name, phone_number)) # Вставляем в таблицу данные в соответствующие столбцы
-    conn.commit() 
-    print("Контакт успешно добавлен") # Оповещаем пользователя
+4. _Функция для добавления контакта:_
+
 ```
-4. _Функция просмотра всех контактов:_
+def add_contact():
+    name = easygui.enterbox("Введите имя контакта: ")
+    phone_number = easygui.enterbox("Введите номер телефона контакта: ")
+    extra_phone_number = easygui.enterbox("Введите дополнительный номер телефона контакта: ")
+    email = easygui.enterbox("Введите электронную почту контакта: ")
+    address = easygui.enterbox("Введите адрес контакта: ")
+    cursor.execute("INSERT INTO phonebook (name, phone_number, extra_phone_number, email, address) VALUES (?, ?, ?, ?, ?)", (name, phone_number, extra_phone_number, email, address))
+    conn.commit()
+    msgbox("Контакт успешно добавлен")
+
+```
+5. _Функция просмотра всех контактов:_
 
 ```
 def view_contacts():
     cursor.execute("SELECT * FROM phonebook")
     contacts = cursor.fetchall()
+    contacts_str = ""
     for contact in contacts:
-        print(contact) # выводим всю информацию из таблицы
+        contacts_str += "ID: {} \nИмя: {} \nНомер телефона: {} \nДополнительный номер: {} \nEmail: {} \nАдрес: {} \n\n".format(contact[0], contact[1], contact[2], contact[3], contact[4], contact[5])
+    easygui.msgbox(contacts_str, title="Contacts")
 ```
-5. _Функция для поиска контакта по id:_
+6. _Функция для поиска контакта по id:_
 
 ```
-def search_contact(id_contact):
-    cursor.execute("SELECT * FROM phonebook WHERE id=?", (id_contact)) # ищем строку с соответсвующим id
+def search_contact_id():
+    id_contact = easygui.enterbox("Введите id контакта: ")
+    cursor.execute("SELECT * FROM phonebook WHERE id=?", (id_contact))
     contact = cursor.fetchone()
     if contact:
-        print(contact) # выводим, если такой контакт есть
+        msgbox(contact)
     else:
-        print("Контакт не найден") #сообщаем пользователю, если такого контакта нет.
+        msgbox("Контакт не найден")
 ```
-6. _Функция для удаления контакта:_
+7. _Функция для удаления контакта:_
 
 ```
-def delete_contact(id_contact):
-    cursor.execute("DELETE FROM phonebook WHERE id=?", (id_contact)) #удаляем строку с соответсвующим id
+def delete_contact():
+    id_contact = easygui.enterbox("Введите id контакта: ")
+    cursor.execute("DELETE FROM phonebook WHERE id=?", (id_contact))
     conn.commit()
-    print("Контакт успешно удален") #сообщаем пользователю
+    msgbox("Контакт успешно удален")
 ```
 
-7. _Функция для изменения контакта:_
+8. _Функция для изменения контакта:_
 
 ```
-def edit_contact(id_contact, new_name, new_phone_number):
-    cursor.execute("UPDATE phonebook SET name = ?, phone_number = ? WHERE id = ?", (new_name, new_phone_number, id_contact)) #ищем контакт по id и меняем данные
-    conn.commit()
-    print("Контакт успешно изменен") #сообщаем пользователю о том, что провели изменения
+def edit_contact():
+    id_contact = easygui.enterbox("Введите id контакта: ")
+    cursor.execute("SELECT * FROM phonebook WHERE id=?", (id_contact)) #ищем контакт по id
+    contact = cursor.fetchone()
+    if contact: # проверка на наличие контакта
+        new_name = easygui.enterbox("Введите новое имя контакта: ")
+        new_phone_number = easygui.enterbox("Введите новый номер контакта: ")
+        new_extra_phone_number = easygui.enterbox("Введите новый  дополнительный номер контакта: ")
+        new_email = easygui.enterbox("Введите новую электронную почту контакта: ")
+        new_address = easygui.enterbox("Введите новый адрес контакта: ")
+        cursor.execute("UPDATE phonebook SET name = ?, phone_number = ?, extra_phone_number = ?, email = ?, address = ? WHERE id = ?", (new_name, new_phone_number,new_extra_phone_number, new_email, new_address, id_contact))
+        conn.commit()
+        msgbox("Контакт успешно изменен") #Если контакт есть, меняем и сохраняем изменения
+    else: # Если такого контакта нет, сообщаем пользователю
+        msgbox("Контакт не найден")
+    
 ```
 
-8. _Реализация меню программы:_
+9. _Реализация меню программы:_
 
 ```
-while True:    #запускаем цикл программы
-    print('Что вы хотите сделать?') 
-    user_choice = input('\  #считываем выбор пользователя
-    1 - Посмотреть контакты\n\
-    2 - Найти контакт\n\
-    3 - Добавить контакт\n\
-    4 - Изменить контакт\n\
-    5 - Удалить контакт\n\
-    0 - Выйти из приложения\n')
-    print()
-    if user_choice == '1':
-        print(view_contacts())
-        print()
-    elif user_choice == '2':
-        search_contact(id_contact = input("Введите id контакта: "))
-        print()
-    elif user_choice == '3':
-        add_contact(name = input("Введите имя контакта: "), phone_number = input("Введите номер телефона контакта: "))
-        print()
-        pass
-    elif user_choice == '4':
-        edit_contact(id_contact = input("Введите id контакта: "), new_name = input("Введите новое имя контакта: "), new_phone_number = input("Введите номер телефона контакта: "))
-        print()
-        pass
-    elif user_choice == '5':
-        delete_contact(id_contact = input("Введите id контакта: "))
-        print()
-        pass
-    elif user_choice == '0' # данный выбор пользователя завершает программу
-        print('До свидания!')
-        print()
+while True:
+    choice = easygui.choicebox("Что вы хотите сделать?", choices = ["Посмотреть контакты", "Найти контакт", "Добавить контакт", 
+                                                                    "Удалить контакт", "Изменить контакт", "Выход"])
+    if choice == "Посмотреть контакты":
+        view_contacts()
+    elif choice == "Найти контакт":
+        search_contact_id()
+    # elif choice == "Найти контакт по электронной почте":
+    #     search_contact_email()
+    elif choice == "Добавить контакт":
+        add_contact()
+    elif choice == "Изменить контакт":
+        edit_contact()
+    elif choice == "Удалить контакт":
+        delete_contact()
+    elif choice == "Выход":
         break
-    else:
-        print('Неправильно выбрана команда!') 
-        print()
-    continue # Продолжаем цикл пока пользователь его не прервёт elif user_choice == '0'
 ```

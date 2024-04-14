@@ -8,7 +8,8 @@ cursor = conn.cursor()
 cursor.execute('''CREATE TABLE IF NOT EXISTS phonebook
                 (id INTEGER PRIMARY KEY AUTOINCREMENT,
                 name TEXT NOT NULL,
-                phone_number TEXT NOT NULL, extra_phone_number TEXT NOT NULL, email TEXT NOT NULL, address TEXT NOT NULL)''')
+                phone_number TEXT NOT NULL, extra_phone_number TEXT NOT NULL, 
+               email TEXT NOT NULL, address TEXT NOT NULL)''')
 
 # Добавление контакта
 def add_contact():
@@ -39,16 +40,6 @@ def search_contact_id():
         msgbox(contact)
     else:
         msgbox("Контакт не найден")
-
-# Поиск контакта по адресу электронной почты
-# def search_contact_email():
-#     email_contact = easygui.enterbox("Введите электронную почту контакта: ")
-#     cursor.execute("SELECT * FROM phonebook WHERE email=?", (email_contact))
-#     contact = cursor.fetchone()
-#     if contact:
-#         msgbox(contact)
-#     else:
-#         msgbox("Контакт не найден")
 
 # Удаление контакта
 def delete_contact():
